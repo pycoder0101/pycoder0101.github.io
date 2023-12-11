@@ -67,73 +67,57 @@
 </head>
 <body>
   <div id="batteryContainer">
-    <div id="batteryLevel">Battery Level: <span id="batteryValue">Loading...</span></div>
+    <div id="batteryLevel">बैटरी स्तर: <span id="batteryValue">लोड हो रहा है...</span></div>
     <div id="batteryIndicator">
       <div id="batteryFill"></div>
     </div>
     <div id="chargingStatus"></div>
-    <button onclick="speakBatteryInfo()">Speak Battery Info</button>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       function updateBatteryInfo() {
-        if ('speechSynthesis' in window) {
-          alert('Speech Synthesis is supported!');
+        const batteryValueElement = document.getElementById('batteryValue');
+        const batteryFillElement = document.getElementById('batteryFill');
+        const chargingStatusElement = document.getElementById('chargingStatus');
+
+        const batteryLevel = Math.floor(battery.level * 100);
+        batteryValueElement.textContent = batteryLevel + '%';
+        batteryFillElement.style.width = batteryLevel + '%';
+
+        if (battery.charging) {
+          batteryFillElement.style.backgroundColor = '#4CAF50'; // Green color for charging
+          chargingStatusElement.textContent = 'चार्ज हो रहा है';
         } else {
-          alert('Speech Synthesis is not supported on this device.');
+          batteryFillElement.style.backgroundColor = '#FF0000'; // Red color for not charging
+          chargingStatusElement.textContent = 'चार्ज नहीं हो रहा है';
         }
 
-        navigator.getBattery().then(function(battery) {
-          const batteryValueElement = document.getElementById('batteryValue');
-          const batteryFillElement = document.getElementById('batteryFill');
-          const chargingStatusElement = document.getElementById('chargingStatus');
-
-          const batteryLevel = Math.floor(battery.level * 100);
-          batteryValueElement.textContent = batteryLevel + '%';
-          batteryFillElement.style.width = batteryLevel + '%';
-
-          // Check if battery is charging
-          if (battery.charging) {
-            batteryFillElement.style.backgroundColor = '#4CAF50'; // Green color for charging
-            chargingStatusElement.textContent = 'Charging';
-          } else {
-            batteryFillElement.style.backgroundColor = '#FF0000'; // Red color for not charging
-            chargingStatusElement.textContent = 'Not Charging';
-          }
-
-          // Speak out the battery percentage
-          speak('Battery level is ' + batteryLevel + ' percent.');
-          
-          // Check if the device is fully charged
-          if (battery.charging && batteryLevel === 100) {
-            speak('The device is fully charged.');
-          }
-        });
+        speakBatteryInfo(batteryLevel);
       }
 
-      function speak(message) {
-        const speechSynthesis = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance(message);
-        utterance.lang = 'en-US'; // English language code
-        speechSynthesis.speak(utterance);
+      function speakBatteryInfo(batteryLevel) {
+        if ('speechSynthesis' in window) {
+          const synth = window.speechSynthesis;
+          const voice = synth.getVoices().find(voice => voice.lang === 'hi' && voice.gender === 'female');
+          const utterance = new SpeechSynthesisUtterance(`बैटरी स्तर ${batteryLevel} प्रतिशत है।`);
+          utterance.lang = 'hi-IN';
+          if (voice) {
+            utterance.voice = voice;
+          }
+          synth.speak(utterance);
+        } else {
+          alert('भाषण संश्लेषण इस उपकरण पर समर्थित नहीं है।');
+        }
       }
 
-      // Initial call to set up the battery info
-      updateBatteryInfo();
-
-      // Event listeners for battery changes
       navigator.getBattery().then(function(battery) {
+        updateBatteryInfo(); // Speak battery information on load
+
         battery.addEventListener('levelchange', updateBatteryInfo);
         battery.addEventListener('chargingchange', updateBatteryInfo);
       });
     });
-
-    function speakBatteryInfo() {
-      const batteryValueElement = document.getElementById('batteryValue');
-      const batteryLevel = batteryValueElement.textContent;
-      speak('Battery level is ' + batteryLevel);
-    }
   </script>
 </body>
 </html>
