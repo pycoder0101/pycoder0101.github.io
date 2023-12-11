@@ -78,6 +78,14 @@
           const batteryLevel = Math.floor(battery.level * 100);
           batteryValueElement.textContent = batteryLevel + '%';
           batteryFillElement.style.width = batteryLevel + '%';
+
+          // Speak out the battery percentage in Hindi female voice
+          speakInHindi('बैटरी प्रतिशत ' + batteryLevel);
+          
+          // Check if the device is fully charged
+          if (battery.charging && batteryLevel === 100) {
+            speakInHindi('डिवाइस पूरी तरह चार्ज हो गई है');
+          }
         });
       }
 
@@ -86,6 +94,21 @@
         const isDaytime = currentHour >= 6 && currentHour < 18;
 
         document.body.style.background = isDaytime ? 'linear-gradient(45deg, #3494E6, #EC6EAD)' : '#04070b';
+      }
+
+      function speakInHindi(message) {
+        const speechSynthesis = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = 'hi-IN'; // Hindi language code
+        utterance.voice = getHindiFemaleVoice();
+        speechSynthesis.speak(utterance);
+      }
+
+      function getHindiFemaleVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        // Find a Hindi female voice (adjust the voice index as needed)
+        const hindiFemaleVoice = voices.find(voice => voice.lang === 'hi-IN' && voice.name.includes('female'));
+        return hindiFemaleVoice || voices.find(voice => voice.lang === 'hi-IN') || voices[0];
       }
 
       updateBatteryInfo();
