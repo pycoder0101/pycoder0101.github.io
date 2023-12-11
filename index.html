@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Battery Percentage</title>
   <style>
     body {
@@ -72,6 +72,7 @@
       <div id="batteryFill"></div>
     </div>
     <div id="chargingStatus"></div>
+    <button onclick="speakBatteryInfo()">Speak Battery Info</button>
   </div>
 
   <script>
@@ -127,6 +128,12 @@
         battery.addEventListener('chargingchange', updateBatteryInfo);
       });
     });
+
+    function speakBatteryInfo() {
+      const batteryValueElement = document.getElementById('batteryValue');
+      const batteryLevel = batteryValueElement.textContent;
+      speak('Battery level is ' + batteryLevel);
+    }
   </script>
 </body>
 </html>
