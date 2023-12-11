@@ -1,84 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Night View</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      overflow: hidden;
-      background-color: #001848; /* Night sky color */
-      animation: starsAnimation 20s linear infinite;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Night View</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #000;
+            color: #fff;
+        }
 
-    @keyframes starsAnimation {
-      0% {
-        background-position: 0 0;
-      }
-      100% {
-        background-position: 1000px 1000px;
-      }
-    }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
 
-    #moon {
-      position: absolute;
-      top: 30px;
-      right: 30px;
-      width: 100px;
-      height: 100px;
-      background-color: #fdd;
-      border-radius: 50%;
-      box-shadow: 0 0 20px 10px #fdd;
-      animation: moonAnimation 20s linear infinite alternate;
-    }
+        #sky {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 70vh;
+            background-color: #222;
+            background-image: url("night_sky.png");
+            background-size: cover;
+        }
 
-    @keyframes moonAnimation {
-      0% {
-        transform: translateY(0);
-      }
-      100% {
-        transform: translateY(20px);
-      }
-    }
+        #moon {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #fff;
+            animation: moon-glow 2s ease-in-out infinite;
+        }
 
-    #river {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 100px;
-      background: linear-gradient(to bottom, #001848, #004080); /* River color gradient */
-    }
+        @keyframes moon-glow {
+            0% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.8;
+            }
+        }
 
-    #clock {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      color: #fff;
-      font-size: 24px;
-    }
-  </style>
+        #river {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 30vh;
+            background-color: #007bff;
+            animation: river-flow 3s ease-in-out infinite;
+        }
+
+        @keyframes river-flow {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 100px 0;
+            }
+        }
+
+        #hills {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 10vh;
+            background-color: #333;
+        }
+
+        #clock {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+        }
+    </style>
 </head>
 <body>
-  <div id="moon"></div>
-  <div id="river"></div>
-  <div id="clock"></div>
-
-  <script>
-    function updateClock() {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
-    }
-
-    // Initial call to set up the clock
-    updateClock();
-
-    // Update the clock every second
-    setInterval(updateClock, 1000);
-  </script>
+    <div id="container">
+        <div id="sky">
+            <div id="moon"></div>
+        </div>
+        <div id="river"></div>
+        <div id="hills"></div>
+        <div id="clock"></div>
+    </div>
+    <script>
+        const clock = document.getElementById("clock");
+        setInterval(() => {
+            const date = new Date();
+            clock.textContent = date.toLocaleTimeString();
+        }, 1000);
+    </script>
 </body>
 </html>
