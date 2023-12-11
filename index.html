@@ -2,122 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Battery Percentage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Night View</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
-      animation: backgroundAnimation 10s infinite alternate;
-    }
-
-    @keyframes backgroundAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
-      100% {
-        background-position: 100% 50%;
-      }
-    }
-
-    #batteryContainer {
-      width: 200px;
-      text-align: center;
-    }
-
-    #batteryLevel {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #fff;
-    }
-
-    #batteryIndicator {
-      width: 100%;
-      height: 30px;
-      background-color: #ddd;
-      border-radius: 5px;
       overflow: hidden;
+      background-color: #001848; /* Night sky color */
+      animation: starsAnimation 20s linear infinite;
     }
 
-    #batteryFill {
-      height: 100%;
-      background-color: #4CAF50;
-      animation: pulsate 1s ease-in-out infinite alternate;
-      transition: width 0.5s ease-in-out;
-    }
-
-    @keyframes pulsate {
+    @keyframes starsAnimation {
       0% {
-        transform: scale(1);
+        background-position: 0 0;
       }
       100% {
-        transform: scale(1.1);
+        background-position: 1000px 1000px;
       }
+    }
+
+    #moon {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      width: 100px;
+      height: 100px;
+      background-color: #fdd;
+      border-radius: 50%;
+      box-shadow: 0 0 20px 10px #fdd;
+      animation: moonAnimation 20s linear infinite alternate;
+    }
+
+    @keyframes moonAnimation {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(20px);
+      }
+    }
+
+    #river {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(to bottom, #001848, #004080); /* River color gradient */
+    }
+
+    #clock {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: #fff;
+      font-size: 24px;
     }
   </style>
 </head>
 <body>
-  <div id="batteryContainer">
-    <div id="batteryLevel">Battery Level: <span id="batteryValue">0%</span></div>
-    <div id="batteryIndicator">
-      <div id="batteryFill"></div>
-    </div>
-  </div>
+  <div id="moon"></div>
+  <div id="river"></div>
+  <div id="clock"></div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      function updateBatteryInfo() {
-        navigator.getBattery().then(function(battery) {
-          const batteryValueElement = document.getElementById('batteryValue');
-          const batteryFillElement = document.getElementById('batteryFill');
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    }
 
-          const batteryLevel = Math.floor(battery.level * 100);
-          batteryValueElement.textContent = batteryLevel + '%';
-          batteryFillElement.style.width = batteryLevel + '%';
+    // Initial call to set up the clock
+    updateClock();
 
-          // Speak out the battery percentage in Hindi female voice
-          speakInHindi('बैटरी प्रतिशत ' + batteryLevel);
-          
-          // Check if the device is fully charged
-          if (battery.charging && batteryLevel === 100) {
-            speakInHindi('डिवाइस पूरी तरह चार्ज हो गई है');
-          }
-        });
-      }
-
-      function setDayOrNightBackground() {
-        const currentHour = new Date().getHours();
-        const isDaytime = currentHour >= 6 && currentHour < 18;
-
-        document.body.style.background = isDaytime ? 'linear-gradient(45deg, #3494E6, #EC6EAD)' : '#04070b';
-      }
-
-      function speakInHindi(message) {
-        const speechSynthesis = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance(message);
-        utterance.lang = 'hi-IN'; // Hindi language code
-        utterance.voice = getHindiFemaleVoice();
-        speechSynthesis.speak(utterance);
-      }
-
-      function getHindiFemaleVoice() {
-        const voices = window.speechSynthesis.getVoices();
-        // Find a Hindi female voice (adjust the voice index as needed)
-        const hindiFemaleVoice = voices.find(voice => voice.lang === 'hi-IN' && voice.name.includes('female'));
-        return hindiFemaleVoice || voices.find(voice => voice.lang === 'hi-IN') || voices[0];
-      }
-
-      updateBatteryInfo();
-      setDayOrNightBackground();
-
-      navigator.getBattery().then(function(battery) {
-        battery.addEventListener('levelchange', updateBatteryInfo);
-      });
-    });
+    // Update the clock every second
+    setInterval(updateClock, 1000);
   </script>
 </body>
 </html>
