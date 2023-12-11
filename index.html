@@ -1,109 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Night View</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: sans-serif;
-            background-color: #000;
-            color: #fff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battery Percentage</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      animation: backgroundAnimation 10s infinite alternate;
+    }
 
-        #container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
+    @keyframes backgroundAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 100% 50%;
+      }
+    }
 
-        #sky {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 70vh;
-            background-color: #222;
-            background-image: url("night_sky.png");
-            background-size: cover;
-        }
+    #batteryContainer {
+      width: 200px;
+      text-align: center;
+    }
 
-        #moon {
-            position: absolute;
-            top: 50px;
-            right: 50px;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #fff;
-            animation: moon-glow 2s ease-in-out infinite;
-        }
+    #batteryLevel {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
 
-        @keyframes moon-glow {
-            0% {
-                opacity: 0.8;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0.8;
-            }
-        }
+    #batteryIndicator {
+      width: 100%;
+      height: 30px;
+      border-radius: 5px;
+      overflow: hidden;
+      background-color: #ddd; /* Default background color */
+    }
 
-        #river {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100vw;
-            height: 30vh;
-            background-color: #007bff;
-            animation: river-flow 3s ease-in-out infinite;
-        }
-
-        @keyframes river-flow {
-            0% {
-                background-position: 0 0;
-            }
-            100% {
-                background-position: 100px 0;
-            }
-        }
-
-        #hills {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100vw;
-            height: 10vh;
-            background-color: #333;
-        }
-
-        #clock {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 2em;
-        }
-    </style>
+    #batteryFill {
+      height: 100%;
+      transition: width 0.5s ease-in-out;
+    }
+  </style>
 </head>
 <body>
-    <div id="container">
-        <div id="sky">
-            <div id="moon"></div>
-        </div>
-        <div id="river"></div>
-        <div id="hills"></div>
-        <div id="clock"></div>
+  <div id="batteryContainer">
+    <div id="batteryLevel">Battery Level: <span id="batteryValue">Loading...</span></div>
+    <div id="batteryIndicator">
+      <div id="batteryFill"></div>
     </div>
-    <script>
-        const clock = document.getElementById("clock");
-        setInterval(() => {
-            const date = new Date();
-            clock.textContent = date.toLocaleTimeString();
-        }, 1000);
-    </script>
+    <div id="chargingStatus"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function updateBatteryInfo() {
+        if ('speechSynthesis' in window) {
+          alert('Speech Synthesis is supported!');
+        } else {
+          alert('Speech Synthesis is not supported on this device.');
+        }
+
+        navigator.getBattery().then(function(battery) {
+          const batteryValueElement = document.getElementById('batteryValue');
+          const batteryFillElement = document.getElementById('batteryFill');
+          const chargingStatusElement = document.getElementById('chargingStatus');
+
+          const batteryLevel = Math.floor(battery.level * 100);
+          batteryValueElement.textContent = batteryLevel + '%';
+          batteryFillElement.style.width = batteryLevel + '%';
+
+          // Check if battery is charging
+          if (battery.charging) {
+            batteryFillElement.style.backgroundColor = '#4CAF50'; // Green color for charging
+            chargingStatusElement.textContent = 'Charging';
+          } else {
+            batteryFillElement.style.backgroundColor = '#FF0000'; // Red color for not charging
+            chargingStatusElement.textContent = 'Not Charging';
+          }
+
+          // Speak out the battery percentage
+          speak('Battery level is ' + batteryLevel + ' percent.');
+          
+          // Check if the device is fully charged
+          if (battery.charging && batteryLevel === 100) {
+            speak('The device is fully charged.');
+          }
+        });
+      }
+
+      function speak(message) {
+        const speechSynthesis = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = 'en-US'; // English language code
+        speechSynthesis.speak(utterance);
+      }
+
+      // Initial call to set up the battery info
+      updateBatteryInfo();
+
+      // Event listeners for battery changes
+      navigator.getBattery().then(function(battery) {
+        battery.addEventListener('levelchange', updateBatteryInfo);
+        battery.addEventListener('chargingchange', updateBatteryInfo);
+      });
+    });
+  </script>
 </body>
 </html>
+
